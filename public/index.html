@@ -2,14 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
     <meta
       name="description"
       content="Web site created using create-react-app"
     />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
@@ -24,6 +22,96 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
+    <script type="text/javascript" src="https://websdk.socure.com/bundle.js"></script>
+    <script type="text/javascript">
+
+        var configobject =
+        {
+            flow: {
+                "name": "socure_default"
+            }
+        };
+
+        var sdkInitiated = false
+
+        function onProgress(progress) {
+            console.log(progress);
+            console.log('progress')
+        }
+        function onSuccess(response) {
+            console.log(response);
+            console.log('success');
+        }
+        function onError(error) {
+            console.log(error);
+            console.log('error');
+        }
+
+
+        var config = {
+            onProgress: onProgress, //callback method for reading the progress status
+            onSuccess: onSuccess, //callback method to read the success response
+            onError: onError, //callback method to read the error response
+            qrCodeNeeded: true
+        };
+
+
+        var inputData =
+        {
+            "customerUserId": "customIDFromTheCustomer"
+        };
+
+        var inpconfig = {
+            "sendMessage": true,
+            "dataMandatory": false
+            //"language": "es",
+            //"flow": "socure_default",
+            //"documentType": "license",
+            //"language": "es",
+            // "redirect": {
+            //     "method": "GET",
+            //     "url": "https://socure.com",
+            //     "headers": {
+            //         "": ""
+            //     }
+            // },
+        };
+
+        var mySdkKey = //MySDKKeyGoesHere//
+        function start() {
+
+            // Call Reset If they initialized ONCE
+            if (sdkInitiated) {
+                clearSession();
+                console.log('cleaned');
+                sdkInitiated = false;
+            }
+
+            SocureInitializer.init(mySdkKey)
+                .then(lib => {
+                    lib.init(mySdkKey, "#root", config).then(function () {
+                        lib.start(2, inputData).then(function (response) {
+                            console.log(response.referenceId)
+                            sdkInitiated = true;
+                        },
+                            function (error) {
+                                console.log(error);
+                            }
+                        );
+                    });
+                });
+        };
+
+        function clearSession() {
+            Socure.cleanup();
+            Socure.reset();
+            sessionStorage.removeItem('documentVerificationToken');
+            sessionStorage.removeItem('publicApiKey');
+            localStorage.removeItem('devicer_id');
+            console.log("Socure DocV Session cleaned!")
+        }
+
+    </script>
     <title>React App</title>
   </head>
   <body>
